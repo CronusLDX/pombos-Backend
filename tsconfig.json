@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2024", // Versão do JS gerado
+    "module": "commonjs", // Sistema de módulos
+    "outDir": "./dist", // Pasta de saída
+    "rootDir": "./src", // Pasta com o código TS
+    "strict": true, // Ativa verificações mais rígidas
+    "esModuleInterop": true, // Permite importar módulos CommonJS
+    "forceConsistentCasingInFileNames": true, // Mantém consistência nos nomes dos arquivos
+    "skipLibCheck": true // Ignora verificação de tipos de pacotes externos
+  },
+  "include": ["src"], // Inclui arquivos da pasta src
+  "exclude": ["node_modules"] // Exclui a pasta node_modules
+}

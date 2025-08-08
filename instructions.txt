@@ -1,0 +1,154 @@
+npm install helmet jsonwebtoken express-rate-limit bcrypt
+E para garantir tipagem TypeScript (essencial no seu caso):
+bash
+Copiar
+Editar
+npm install -D @types/helmet @types/jsonwebtoken @types/express-rate-limit @types/bcrypt
+
+
+import mongoose from 'mongoose';
+
+const ClienteSchema = new mongoose.Schema({
+  id: String,
+  nome: String,
+  telefone: String,
+});
+
+const AtendenteSchema = new mongoose.Schema({
+  id: String,
+  nome: String,
+  email: String,
+});
+
+const EmpresaSchema = new mongoose.Schema({
+  nome: { type: String, required: true },
+  clientes: [ClienteSchema],
+  atendentes: [AtendenteSchema],
+});
+
+const Empresa = mongoose.model('Empresa', EmpresaSchema);
+export default Empresa;
+
+import { Request, Response } from 'express';
+import Empresa from '../models/empresa.model';
+
+class EmpresaController {
+  // Cria uma nova empresa
+  static async criarEmpresa(req: Request, res: Response) {
+    try {
+      const empresa = await Empresa.create(req.body);
+      res.status(201).json(empresa);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao criar empresa', error: err });
+    }
+  }
+
+  // Adiciona um cliente
+  static async adicionarCliente(req: Request, res: Response) {
+    try {
+      const { empresaId } = req.params;
+      const cliente = req.body;
+
+      const empresa = await Empresa.findByIdAndUpdate(
+        empresaId,
+        { $push: { clientes: cliente } },
+        { new: true }
+      );
+
+      res.status(200).json(empresa);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao adicionar cliente', error: err });
+    }
+  }
+
+  // Adiciona um atendente
+  static async adicionarAtendente(req: Request, res: Response) {
+    try {
+      const { empresaId } = req.params;
+      const atendente = req.body;
+
+      const empresa = await Empresa.findByIdAndUpdate(
+        empresaId,
+        { $push: { atendentes: atendente } },
+        { new: true }
+      );
+
+      res.status(200).json(empresa);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao adicionar atendente', error: err });
+    }
+  }
+
+  // Buscar todos os clientes de uma empresa
+  static async listarClientes(req: Request, res: Response) {
+    try {
+      const { empresaId } = req.params;
+      const empresa = await Empresa.findById(empresaId);
+      res.status(200).json(empresa?.clientes);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao buscar clientes', error: err });
+    }
+  }
+
+  // Buscar todos os atendentes de uma empresa
+  static async listarAtendentes(req: Request, res: Response) {
+    try {
+      const { empresaId } = req.params;
+      const empresa = await Empresa.findById(empresaId);
+      res.status(200).json(empresa?.atendentes);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao buscar atendentes', error: err });
+    }
+  }
+
+  // Excluir um cliente por ID
+  static async removerCliente(req: Request, res: Response) {
+    try {
+      const { empresaId, clienteId } = req.params;
+      const empresa = await Empresa.findByIdAndUpdate(
+        empresaId,
+        { $pull: { clientes: { id: clienteId } } },
+        { new: true }
+      );
+      res.status(200).json(empresa);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao remover cliente', error: err });
+    }
+  }
+
+  // Excluir um atendente por ID
+  static async removerAtendente(req: Request, res: Response) {
+    try {
+      const { empresaId, atendenteId } = req.params;
+      const empresa = await Empresa.findByIdAndUpdate(
+        empresaId,
+        { $pull: { atendentes: { id: atendenteId } } },
+        { new: true }
+      );
+      res.status(200).json(empresa);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao remover atendente', error: err });
+    }
+  }
+}
+
+export default EmpresaController;
+
+
+import express from 'express';
+import EmpresaController from '../controllers/empresa.controller';
+
+const router = express.Router();
+
+router.post('/empresa', EmpresaController.criarEmpresa);
+
+router.post('/empresa/:empresaId/clientes', EmpresaController.adicionarCliente);
+router.post('/empresa/:empresaId/atendentes', EmpresaController.adicionarAtendente);
+
+router.get('/empresa/:empresaId/clientes', EmpresaController.listarClientes);
+router.get('/empresa/:empresaId/atendentes', EmpresaController.listarAtendentes);
+
+router.delete('/empresa/:empresaId/clientes/:clienteId', EmpresaController.removerCliente);
+router.delete('/empresa/:empresaId/atendentes/:atendenteId', EmpresaController.removerAtendente);
+
+export default router;
