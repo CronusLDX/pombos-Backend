@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:tsc": "npx tsc --watch",
-    "build:nodemon": "nodemon ./dist/index.js"
+    "build:tsc": "npx tsc ",
+    "build:nodemon": "nodemon ./dist/index.js",
+    "build": "node ./dist/index.js",
+    "tsc": "npx tsc --watch"
   },
   "keywords": [],
   "author": "",
