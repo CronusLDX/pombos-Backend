@@ -15,7 +15,7 @@ class Server {
     this.Routes();
   }
   public Middleware() {
-    this.app.use(Cors({ origin: 'https://pombos-backend.onrender.com/' }));
+    this.app.use(Cors({ origin: 'https://pombos-backend.onrender.com' }));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(helmet());
